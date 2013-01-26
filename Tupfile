@@ -1,0 +1,7 @@
+.gitignore
+
+: foreach *.peg |> peg -o%o %f |> %B.h
+: foreach *.cpp | parse.h |> g++ -Wall -fPIC -c %f -o %o |> %B.o
+: *.o |> g++ -shared -o %o -L/usr/lib %f |> moonparse.so
+
+: foreach *.moon |> moonc %f |> %B.lua

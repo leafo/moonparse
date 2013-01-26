@@ -1,0 +1,4 @@
+
+start <- number / word
+number <- { (printf("before number\n"), 1) } [0-9]+ { printf("after number\n"); }
+word <- { printf("before word\n"); } [a-zA-Z_] &{ printf("inside word\n"), 1 } [a-zA-Z_0-9]+ { printf("before word\n"); } 
