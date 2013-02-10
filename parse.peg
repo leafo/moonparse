@@ -1,4 +1,15 @@
 
-start <- number / word
-number <- &{ printf("testing number\n"), 1 } [0-9]+ { printf("after number\n"); }
-word <- &{ printf("testing word\n"), 1 } [a-zA-Z_]  [a-zA-Z_0-9]*  { printf("after word\n"); }
+start <- exp space !.
+space <- [ \t]*
+op <- space < [-+] > { push_string(yytext); }
+
+exp <- &{ start() } value (op value)* { stop("exp"); flatten_last() } / &{ reject() }
+
+value <- space (number / word)
+number <- < [0-9]+ > { push_simple("number", yytext); }
+word <- < [a-zA-Z_] [a-zA-Z_0-9]* > { push_simple("word", yytext); }
+
+
+# multi-match style
+# number <- space &{ start() } < [0-9]+ > { push_string(yytext), stop("number"); } / &{ reject() }
+

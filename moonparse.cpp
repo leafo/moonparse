@@ -41,20 +41,64 @@ void begin() {
   pos_stack.push(lua_gettop(_l));
 }
 
-void start() {
+int start() {
+  printf("* starting\n");
   lua_pushnil(_l);
   pos_stack.push(lua_gettop(_l));
+  return 1;
 }
 
-void stop(const char* name) {
+int stop(const char* name) {
+  printf("* stop '%s'\n", name);
   int top = pos_stack.top();
+  pos_stack.pop();
+
   lua_newtable(_l);
   lua_pushstring(_l, name);
   lua_rawseti(_l, -2, 1);
+
+  lua_replace(_l, top); // put table in place of nil
+  // pop values
+  int cur = lua_gettop(_l);
+  int i = cur - top;
+  while (i >= 1) {
+    lua_rawseti(_l, top, i-- + 1);
+  }
+
+  return 1;
+}
+
+int reject() {
+  printf("* rejecting\n");
+
+  int top = pos_stack.top();
+  pos_stack.pop();
+  lua_settop(_l, top);
+
+  return 0;
 }
 
 void push_string(const char* str) {
+  printf("* pushing '%s'\n", str);
   lua_pushstring(_l, str);
+}
+
+void push_simple(const char* name, const char* value) {
+  printf("* pushing simple '%s' '%s'\n", name, value);
+  lua_newtable(_l);
+  lua_pushstring(_l, name);
+  lua_rawseti(_l, -2, 1);
+
+  lua_pushstring(_l, value);
+  lua_rawseti(_l, -2, 2);
+}
+
+void flatten_last() {
+  int len = lua_rawlen(_l, -1);
+  if (len == 2) {
+    lua_rawgeti(_l, -1, 2);
+    lua_remove(_l, -2);
+  }
 }
 
 #define YY_INPUT(buf, result, max_size) put_input(buf, &result, max_size)
@@ -65,11 +109,16 @@ int parse(lua_State* l) {
   size_t len;
   const char* input = luaL_checklstring(l, 1, &len);
   _l = l;
+
+  pos_stack = std::stack<int>();
+  begin();
+
   set_parse_buffer(input, len);
 
   printf("input: %s\n", input);
-  while (yyparse()) {
-    lua_pushboolean(l, 1);
+
+  if (yyparse()) {
+    printf("pos: %d len: %d\n", parse_buffer_pos, parse_buffer_len);
     return 1;
   }
 
