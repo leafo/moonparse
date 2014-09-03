@@ -41,28 +41,40 @@ void begin() {
   pos_stack.push(lua_gettop(_l));
 }
 
-int start() {
-  printf("* starting\n");
+int start(const char* name=0) {
+  if (name)
+    printf("* starting '%s'\n", name);
+  else
+    printf("* starting\n");
   lua_pushnil(_l);
   pos_stack.push(lua_gettop(_l));
   return 1;
 }
 
-int stop(const char* name) {
-  printf("* stop '%s'\n", name);
+int stop(const char* name=0) {
+  if (name)
+    printf("* stop '%s'\n", name);
+  else
+    printf("* stop\n");
+
   int top = pos_stack.top();
   pos_stack.pop();
 
   lua_newtable(_l);
-  lua_pushstring(_l, name);
-  lua_rawseti(_l, -2, 1);
+
+  if (name) {
+    lua_pushstring(_l, name);
+    lua_rawseti(_l, -2, 1);
+  }
 
   lua_replace(_l, top); // put table in place of nil
   // pop values
   int cur = lua_gettop(_l);
   int i = cur - top;
+  int offset = name ? 1 : 0;
+
   while (i >= 1) {
-    lua_rawseti(_l, top, i-- + 1);
+    lua_rawseti(_l, top, i-- + offset);
   }
 
   return 1;
@@ -94,7 +106,7 @@ void push_simple(const char* name, const char* value) {
 }
 
 void flatten_last() {
-  int len = lua_rawlen(_l, -1);
+  int len = lua_objlen(_l, -1);
   if (len == 2) {
     lua_rawgeti(_l, -1, 2);
     lua_remove(_l, -2);
@@ -117,11 +129,7 @@ int parse(lua_State* l) {
 
   printf("input: %s\n", input);
 
-  if (yyparse()) {
-    printf("pos: %d len: %d\n", parse_buffer_pos, parse_buffer_len);
-    return 1;
-  }
-
+  if (yyparse()) return 1;
   return 0;
 }
 
@@ -130,7 +138,7 @@ luaL_Reg funcs[] = {
 };
 
 int luaopen_moonparse(lua_State *l) {
-  luaL_newlib(l, funcs);
+  luaL_register(l, "enet", funcs);
   return 1;
 }
 

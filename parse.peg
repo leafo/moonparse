@@ -1,9 +1,13 @@
 
-start <- exp space !.
+start <- block space !.
 space <- [ \t]*
+break <- "\n"
+
+block <- &{ start("block") } exp (break exp)* { stop() } / &{ reject() }
+
 op <- space < [-+] > { push_string(yytext); }
 
-exp <- &{ start() } value (op value)* { stop("exp"); flatten_last() } / &{ reject() }
+exp <- &{ start("exp") } value (op value)* &{ stop("exp"), flatten_last(), 1 } / &{ reject() }
 
 value <- space (number / word)
 number <- < [0-9]+ > { push_simple("number", yytext); }
