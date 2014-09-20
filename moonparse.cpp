@@ -51,8 +51,6 @@ int start(const char* name=0) {
     printf("* starting\n");
   }
 
-  dump_stack(_l);
-
   lua_pushnil(_l); // slot for the finish object
   pos_stack.push(lua_gettop(_l));
   return 1;
@@ -64,8 +62,6 @@ int stop(const char* name=0) {
   } else {
     printf("* stop\n");
   }
-
-  dump_stack(_l);
 
   int top = pos_stack.top();
   pos_stack.pop();
@@ -90,8 +86,12 @@ int stop(const char* name=0) {
   return 1;
 }
 
-int reject() {
-  printf("* rejecting\n");
+int reject(const char* name=0) {
+  if (name) {
+    printf("* rejecting '%s'\n", name);
+  } else {
+    printf("* rejecting\n");
+  }
 
   int top = pos_stack.top();
   pos_stack.pop();
@@ -119,12 +119,18 @@ int push_simple(const char* name, const char* value) {
   return 1;
 }
 
+// converts a single value exp to just the value
 int flatten_last() {
   int len = lua_objlen(_l, -1);
   if (len == 2) {
     lua_rawgeti(_l, -1, 2);
     lua_remove(_l, -2);
   }
+  return 1;
+}
+
+int check_indent(const char* indent) {
+  // indent always passes
   return 1;
 }
 
@@ -155,6 +161,11 @@ luaL_Reg funcs[] = {
 int luaopen_moonparse(lua_State *l) {
   luaL_register(l, "moonparse", funcs);
   return 1;
+}
+
+int _debug(const char* msg, int ret) {
+  printf("DEBUG: %s\n", msg);
+  return ret;
 }
 
 // adapted from http://cc.byexamples.com/2008/11/19/lua-stack-dump-for-c/
