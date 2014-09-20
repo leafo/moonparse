@@ -56,11 +56,11 @@ int start(const char* name=0) {
   return 1;
 }
 
-int stop(const char* name=0) {
+int accept(const char* name=0) {
   if (name) {
-    printf("* stop '%s'\n", name);
+    printf("* accept '%s'\n", name);
   } else {
-    printf("* stop\n");
+    printf("* accept\n");
   }
 
   int top = pos_stack.top();
