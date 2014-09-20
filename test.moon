@@ -4,23 +4,16 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-
-
-
-
-10 + 3
-
-yes
-
-
-3 + no
-
+if hello then world
+1 + 5
 ]]
 
 tree = parse code
 p tree
 
+-- print "Classic parser"
 -- p old.string code
--- compile = require "moonscript.compile"
--- print (compile.tree tree)
+
+compile = require "moonscript.compile"
+print (compile.tree tree)
 

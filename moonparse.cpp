@@ -134,6 +134,11 @@ int check_indent(const char* indent) {
   return 1;
 }
 
+int _debug(const char* msg, int ret) {
+  printf("DEBUG: %s\n", msg);
+  return ret;
+}
+
 #define YY_INPUT(buf, result, max_size) put_input(buf, &result, max_size)
 
 #include "parse.h"
@@ -163,10 +168,6 @@ int luaopen_moonparse(lua_State *l) {
   return 1;
 }
 
-int _debug(const char* msg, int ret) {
-  printf("DEBUG: %s\n", msg);
-  return ret;
-}
 
 // adapted from http://cc.byexamples.com/2008/11/19/lua-stack-dump-for-c/
 void dump_stack(lua_State* l) {

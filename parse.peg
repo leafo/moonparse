@@ -4,12 +4,15 @@ space <- [ \t]*
 break <- "\n"
 stop <- break / !. # line break or end of file
 
-block <- &{ start("block") } line (break line)* &{ accept("block") } / &{ reject("block") }
+block <- &{ start("block") } line (break line)* &{ accept() } / &{ reject("block") }
 
 line <- statement / empty_line
 
 empty_line <- space &stop
-statement <- <space> &{ check_indent(yytext) } exp space &stop
+statement <- <space> &{ check_indent(yytext) } (
+	if /
+	exp
+	) space &stop
 
 op <- space < [-+] > &{ push_string(yytext) }
 
@@ -18,6 +21,10 @@ exp <- &{ start("exp") } value (op value)* &{ accept("exp"), flatten_last() } / 
 value <- space (number / ref)
 number <- < [0-9]+ > &{ push_simple("number", yytext) }
 ref <- < [a-zA-Z_] [a-zA-Z_0-9]* > &{ push_simple("ref", yytext) }
+
+if <- &{ start("if") }
+	"if" exp space "then" ( &{ start() } exp &{ accept() } / &{ reject() } )
+	&{ accept("if") } / &{ reject("if") }
 
 # multi-match style
 # number <- space &{ start() } < [0-9]+ > &{ push_string(yytext), accept("number"); } / &{ reject() }
