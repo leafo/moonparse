@@ -95,7 +95,7 @@ int reject(const char* name=0) {
 
   int top = pos_stack.top();
   pos_stack.pop();
-  lua_settop(_l, top);
+  lua_settop(_l, top - 1);
 
   return 0;
 }

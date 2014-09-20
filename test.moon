@@ -4,9 +4,16 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-  
+
+
+
+
 10 + 3
-100
+
+yes
+
+
+3 + no
 
 ]]
 
