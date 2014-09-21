@@ -1,8 +1,8 @@
 
 peg = require "moonparse.peg"
-import V, P, C, build_grammar from peg
+import V, P, C, S, build_grammar from peg
 
-print -V"what"
+print -S"a-z"
 
 -- print (V"hello" * V"world")^-2
 

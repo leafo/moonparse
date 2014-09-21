@@ -1,6 +1,6 @@
 
 peg = require "moonparse.peg"
-import V, P, C, L, build_grammar from peg
+import V, P, C, L, R, S, build_grammar from peg
 
 same = (a,b) ->
   assert.same tostring(a), tostring(b)
@@ -43,8 +43,18 @@ describe "moonparse.peg", ->
     same [[< hello >]], C "hello" -- TODO: coerce to P
     same [[< hello / world >]], C (V"hello" + V"world")
 
+
+  it "range", ->
+    same "[a-zA-Z]", R "az", "AZ"
+
+  it "set", ->
+    same "[abcd]", S "abcd"
+
   it "negate", ->
     same [[- "hello"]], -P"hello"
     same [[- hello]], -V"hello"
     same [[- ( hello world )]], -(V"hello" * V"world")
+    same "[^abcd]", -S "abcd"
+
+
 

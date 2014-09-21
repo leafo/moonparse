@@ -14,7 +14,7 @@ class Node
   __mul: (a,b) -> SequenceOp a,b
   __div: (a,b) -> error "divide not defined"
   __pow: (a,b) -> RepeatOp a,b
-  __unm: (a) -> UnaryOp a, "-", false
+  __unm: (a) -> Negate a
 
   __len: (a) -> UnaryOp a, "&", false
 
@@ -64,6 +64,18 @@ class UnaryOp extends Node
       "#{val} #{@op}"
     else
       "#{@op} #{val}"
+
+class Negate extends UnaryOp
+  new: (val) =>
+    super val, "-", false
+
+  __tostring: =>
+    if @val.__class == Set
+      set = Set @val.val
+      set.negate = true
+      return tostring set
+
+    UnaryOp.__tostring @
 
 RepeatOp = (a, b) ->
   assert type(b), "number"
@@ -122,6 +134,34 @@ class Capture extends Node
   new: (@val) =>
   __tostring: => "< #{@val} >"
 
+-- TODO: escape -
+class Set extends Node
+  negate: false
+
+  new: (@val) =>
+  __tostring: =>
+    if @negate
+      "[^#{@val}]"
+    else
+      "[#{@val}]"
+
+-- TODO: escape-
+class Range extends Node
+  new: (...) =>
+    @pairs = {...}
+
+  __tostring: =>
+    ranges = for p in *@pairs
+      switch #p
+        when 1
+          p
+        when 2
+          p\sub(1,1) .. "-" .. p\sub(2,2)
+        else
+          error "invalid range: #{p}"
+
+    "[#{table.concat ranges}]"
+
 build_grammar = (grammar) ->
   start = assert grammar[1], "missing grammar start state"
   start_val = tostring start
@@ -142,6 +182,8 @@ build_grammar = (grammar) ->
   V: Identifier
   P: Literal
   C: Capture
+  S: Set
+  R: Range
 
   -- synonym for #
   L: (x) -> Node.__len x
