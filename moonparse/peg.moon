@@ -65,6 +65,9 @@ RepeatOp = (a, b) ->
   if b == 1
     return UnaryOp a, "+"
 
+  if b == -1
+    return UnaryOp a, "?"
+
   if b >= 0
     inside = UnaryOp a, "*"
     while b > 1
@@ -73,7 +76,13 @@ RepeatOp = (a, b) ->
     return inside
 
   if b < 0
-    nil
+    b = -b
+    inside = UnaryOp a, "?"
+    while b > 1
+      b -= 1
+      inside = SequenceOp UnaryOp(a, "?"), inside
+
+    return inside
 
   error "Not sure how to handle rep #{b}"
 

@@ -27,3 +27,10 @@ describe "moonparse.peg", ->
 
     same "( hello world ) +", (V"hello" * V"world")^1
 
+    same "hello ?", V"hello"^-1
+    same "hello ? hello ?", V"hello"^-2
+    same "hello ? hello ? hello ?", V"hello"^-3
+
+    same "( hello world ) ? ( hello world ) ?", (V"hello" * V"world")^-2
+
+
