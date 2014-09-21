@@ -1,7 +1,7 @@
 
 local *
 
-operators = {"__add","__sub", "__mul", "__div", "__pow", "__tostring"}
+operators = {"__add", "__sub", "__mul", "__div", "__pow", "__unm", "__tostring"}
 
 class Node
   __inherited: (child) =>
@@ -14,7 +14,9 @@ class Node
   __mul: (a,b) -> SequenceOp a,b
   __div: (a,b) -> error "divide not defined"
   __pow: (a,b) -> RepeatOp a,b
-  __len: (a) -> NoConsume a
+  __unm: (a) -> UnaryOp a, "-", false
+
+  __len: (a) -> UnaryOp a, "&", false
 
 class OperatorNode extends Node
   is_operator: true
@@ -49,8 +51,8 @@ class SequenceOp extends OperatorNode
   op_text: " "
 
 class UnaryOp extends Node
-  -- p: 3
-  new: (@val, @rep) =>
+  -- p: 3 -- TODO:
+  new: (@val, @op, @suffix=true) =>
 
   __tostring: =>
     val = if @val.is_operator
@@ -58,7 +60,10 @@ class UnaryOp extends Node
     else
       "#{@val}"
 
-    "#{val} #{@rep}"
+    if @suffix
+      "#{val} #{@op}"
+    else
+      "#{@op} #{val}"
 
 RepeatOp = (a, b) ->
   assert type(b), "number"
@@ -117,17 +122,6 @@ class Capture extends Node
   new: (@val) =>
   __tostring: => "< #{@val} >"
 
-
-class NoConsume extends Node
-  new: (@val) =>
-  __tostring: =>
-    val = if @val.is_operator
-      "( #{@val} )"
-    else
-      "#{@val}"
-
-    "& #{val}"
-
 build_grammar = (grammar) ->
   start = assert grammar[1], "missing grammar start state"
   start_val = tostring start
@@ -148,7 +142,9 @@ build_grammar = (grammar) ->
   V: Identifier
   P: Literal
   C: Capture
-  L: NoConsume -- synonym for #
+
+  -- synonym for #
+  L: (x) -> Node.__len x
 
   :build_grammar
 }

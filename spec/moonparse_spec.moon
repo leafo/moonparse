@@ -42,3 +42,9 @@ describe "moonparse.peg", ->
     same [[< "hello" >]], C P "hello"
     same [[< hello >]], C "hello" -- TODO: coerce to P
     same [[< hello / world >]], C (V"hello" + V"world")
+
+  it "negate", ->
+    same [[- "hello"]], -P"hello"
+    same [[- hello]], -V"hello"
+    same [[- ( hello world )]], -(V"hello" * V"world")
+
