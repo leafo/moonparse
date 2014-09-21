@@ -141,7 +141,7 @@ int _debug(const char* msg, int ret) {
 
 #define YY_INPUT(buf, result, max_size) put_input(buf, &result, max_size)
 
-#include "parse.h"
+#include "parse2.h"
 
 int parse(lua_State* l) {
   size_t len;

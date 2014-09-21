@@ -8,12 +8,17 @@ if hello then world
 1 + 5
 ]]
 
+code = [[
+hello
+hello
+]]
+
 tree = parse code
 p tree
 
 -- print "Classic parser"
 -- p old.string code
 
-compile = require "moonscript.compile"
-print (compile.tree tree)
+-- compile = require "moonscript.compile"
+-- print (compile.tree tree)
 
