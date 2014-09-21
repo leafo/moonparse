@@ -14,6 +14,7 @@ class Node
   __mul: (a,b) -> SequenceOp a,b
   __div: (a,b) -> error "divide not defined"
   __pow: (a,b) -> RepeatOp a,b
+  __len: (a) -> NoConsume a
 
 class OperatorNode extends Node
   is_operator: true
@@ -113,8 +114,19 @@ class Identifier extends Node
     tostring @name
 
 class Group extends Node
-  new: (@inside) =>
-  __tostring: => "< #{@inside} >"
+  new: (@val) =>
+  __tostring: => "< #{@val} >"
+
+
+class NoConsume extends Node
+  new: (@val) =>
+  __tostring: =>
+    val = if @val.is_operator
+      "( #{@val} )"
+    else
+      "#{@val}"
+
+    "& #{val}"
 
 build_grammar = (grammar) ->
   start = assert grammar[1], "missing grammar start state"
@@ -136,6 +148,7 @@ build_grammar = (grammar) ->
   V: Identifier
   P: Literal
   C: Group
+  L: NoConsume -- synonym for #
 
   :build_grammar
 }
