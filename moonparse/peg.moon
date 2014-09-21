@@ -113,7 +113,7 @@ class Identifier extends Node
   __tostring: =>
     tostring @name
 
-class Group extends Node
+class Capture extends Node
   new: (@val) =>
   __tostring: => "< #{@val} >"
 
@@ -147,7 +147,7 @@ build_grammar = (grammar) ->
 {
   V: Identifier
   P: Literal
-  C: Group
+  C: Capture
   L: NoConsume -- synonym for #
 
   :build_grammar
