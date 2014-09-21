@@ -1,7 +1,7 @@
 
 local *
 
-operators = {"__add","__sub", "__mul", "__div", "__tostring"}
+operators = {"__add","__sub", "__mul", "__div", "__pow", "__tostring"}
 
 class Node
   __inherited: (child) =>
@@ -13,6 +13,7 @@ class Node
   __sub: (a,b) -> error "no sub yet"
   __mul: (a,b) -> SequenceOp a,b
   __div: (a,b) -> error "divide not defined"
+  __pow: (a,b) -> RepeatOp a,b
 
 class OperatorNode extends Node
   is_operator: true
@@ -46,6 +47,36 @@ class SequenceOp extends OperatorNode
   p: 2
   op_text: " "
 
+class UnaryOp extends Node
+  -- p: 3
+  new: (@val, @rep) =>
+
+  __tostring: =>
+    val = if @val.is_operator
+      "( #{@val} )"
+    else
+      "#{@val}"
+
+    "#{val} #{@rep}"
+
+RepeatOp = (a, b) ->
+  assert type(b), "number"
+
+  if b == 1
+    return UnaryOp a, "+"
+
+  if b >= 0
+    inside = UnaryOp a, "*"
+    while b > 1
+      b -= 1
+      inside = SequenceOp a, inside
+    return inside
+
+  if b < 0
+    nil
+
+  error "Not sure how to handle rep #{b}"
+
 class DefineOp extends OperatorNode
   op_text: " <- "
   new: (left, right) =>
@@ -59,6 +90,7 @@ class Literal extends Node
 
   __tostring: =>
     if type(@val) == "number"
+      error "not yet" if @val < 1
       return "."\rep @val
 
     if @val\match '"'
