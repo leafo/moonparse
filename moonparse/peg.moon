@@ -67,7 +67,7 @@ class UnaryOp extends Node
 
 class Negate extends UnaryOp
   new: (val) =>
-    super val, "-", false
+    super val, "!", false
 
   __tostring: =>
     if @val.__class == Set
@@ -162,6 +162,17 @@ class Range extends Node
 
     "[#{table.concat ranges}]"
 
+
+class MatchTimeAction extends Node
+  new: (@code) =>
+  __tostring: =>
+    "&{ #{@code} }"
+
+class Action extends Node
+  new: (@code) =>
+  __tostring: =>
+    "{ #{@code} }"
+
 build_grammar = (grammar) ->
   start = assert grammar[1], "missing grammar start state"
   start_val = tostring start
@@ -184,6 +195,8 @@ build_grammar = (grammar) ->
   C: Capture
   S: Set
   R: Range
+  Mta: MatchTimeAction
+  A: Action
 
   -- synonym for #
   L: (x) -> Node.__len x
