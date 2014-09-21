@@ -9,19 +9,24 @@ class Node
       continue if rawget child.__base, o
       child.__base[o] = @__base[o]
 
-  __add: (a,b) -> AlternateNode a,b
+  __add: (a,b) -> AlternateOp a,b
   __sub: (a,b) -> error "no sub yet"
-  __mul: (a,b) -> SequenceNode a,b
+  __mul: (a,b) -> SequenceOp a,b
   __div: (a,b) -> error "divide not defined"
 
 class OperatorNode extends Node
+  is_operator: true
   p: 0
   op_text: " "
   new: (@left, @right) =>
-    print "Op #{@@__name}"
+    -- coerce operators
+    if type(@left) != "table"
+      @left = Literal @left
+
+    if type(@right) != "table"
+      @right = Literal @right
 
   __tostring: =>
-    print "#{@p}, left: #{@left.p}, right: #{@right.p}"
     left = tostring @left
     right = tostring @right
 
@@ -33,35 +38,64 @@ class OperatorNode extends Node
 
     left .. @op_text .. right
 
-class AlternateNode extends OperatorNode
+class AlternateOp extends OperatorNode
   p: 1
   op_text: " / "
 
-class SequenceNode extends OperatorNode
+class SequenceOp extends OperatorNode
   p: 2
   op_text: " "
 
-class DefineNode extends OperatorNode
+class DefineOp extends OperatorNode
+  op_text: " <- "
+  new: (left, right) =>
+    if type(left) != "table"
+      left = Identifier left
+
+    super left, right
 
 class Literal extends Node
-  new: (@str) =>
+  new: (@val) =>
+
   __tostring: =>
-    if @str\match '"'
-      "'#{@str}'"
+    if type(@val) == "number"
+      return "."\rep @val
+
+    if @val\match '"'
+      "'#{@val}'"
     else
-      '"' .. tostring(@str) .. '"'
+      '"' .. tostring(@val) .. '"'
 
 class Identifier extends Node
   new: (@name) =>
   __tostring: =>
     tostring @name
 
+class Group extends Node
+  new: (@inside) =>
+  __tostring: => "< #{@inside} >"
+
 build_grammar = (grammar) ->
   start = assert grammar[1], "missing grammar start state"
+  start_val = tostring start
+  start_rule = assert grammar[start_val], "missing start rule"
+
+  buffer = {
+    tostring DefineOp start, start_rule
+  }
+
+  for k,v in pairs grammar
+    continue if type(k) == "number"
+    continue if k == start_val
+    table.insert buffer, tostring DefineOp k, v
+
+  table.concat buffer, "\n"
 
 {
-  I: Identifier
+  V: Identifier
   P: Literal
+  C: Group
+
   :build_grammar
 }
 
