@@ -5,15 +5,10 @@ old = require "moonscript.parse"
 
 code = [[
 if hello then world
-1 + 5
-]]
-
-code = [[
-hello
-hello
 ]]
 
 tree = parse code
+print "New parser"
 p tree
 
 -- print "Classic parser"

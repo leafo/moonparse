@@ -44,9 +44,8 @@ print build_grammar {
   number: simple "number", S"0-9"^1
 
   op: V"space" * str(S"-+")
-  exp: capture "exp", V"value" * (V"op" * V"value"), "flatten_last()"
+  exp: capture "exp", V"value" * (V"op" * V"value")^0, "flatten_last()"
 
   statement: C(V"space") * Mta'check_indent(yytext)' * (V"if" + V"exp") * V"space" * L(V"stop")
-  -- if: capture "if",
-  --   P"if" * V"exp" * V"space" * P"then" * ()
+  if: capture "if", P"if" * V"exp" * V"space" * P"then" * (capture V"exp")
 }
