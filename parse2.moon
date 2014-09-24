@@ -3,11 +3,21 @@ peg = require "moonparse.peg"
 import V, P, C, S, L, Mta, A, build_grammar from peg
 
 capture = (name, p, extra_c) ->
-  finalize = "accept(\"#{name}\")"
+  if type(name) == "table"
+    extra_c = p
+    p = name
+    name = nil
+
+  escaped_name = if name
+    "\"#{name}\""
+  else
+    ""
+
+  finalize = "accept(#{escaped_name})"
   if extra_c
     finalize = "#{finalize}, #{extra_c}"
 
-  Mta"start(\"#{name}\")" * p * Mta(finalize) + Mta"reject(\"#{name}\")"
+  Mta"start(#{escaped_name})" * p * Mta(finalize) + Mta"reject(#{escaped_name})"
 
 simple = (name, p) ->
   C(p) * Mta"push_simple(\"#{name}\", yytext)"
@@ -24,7 +34,7 @@ print build_grammar {
   stop: V"break" + -P(1)
 
   start: V"block" * V"space" * -P(1)
-  block: capture "block", V"line" * (V"break" * V"line")^0
+  block: capture V"line" * (V"break" * V"line")^0
 
   line: V"statement" + V"empty_line"
   empty_line: V"space" * L(V"stop")
