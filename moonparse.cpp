@@ -1,6 +1,7 @@
 
-#include <stdio.h>
 #include <stack>
+#include <cstring>
+#include <cstdio>
 
 extern "C" {
 #include <lua.h>
@@ -18,6 +19,7 @@ static int parse_buffer_pos;
 static lua_State* _l;
 
 static std::stack<int> pos_stack;
+static std::stack<int> indent_stack;
 
 void set_parse_buffer(const char* buffer, const size_t len) {
   parse_buffer_pos = 0;
@@ -130,9 +132,44 @@ int flatten_last() {
 }
 
 int check_indent(const char* indent) {
-  // indent always passes
+	printf("checking indent: %d\n", strlen(indent));
+
+	if (indent_stack.empty()) {
+		printf(" status: %d\n", 0 == strlen(indent));
+		return 0 == strlen(indent);
+	}
+
+	printf(" status: %d\n", indent_stack.top() == strlen(indent));
+	return indent_stack.top() == strlen(indent);
+}
+
+int push_indent(const char* indent) {
+	indent_stack.push(strlen(indent));
   return 1;
 }
+
+int pop_indent() {
+	indent_stack.pop();
+  return 1;
+}
+
+// only pushes if indent is greater, otherwise fails
+int advance_indent(const char* indent) {
+	int new_indent = strlen(indent);
+	int top = 0;
+
+	if (!indent_stack.empty()) {
+		top = indent_stack.top();
+	}
+
+	if (new_indent <= top) {
+		return 0;
+	}
+
+	indent_stack.push(new_indent);
+	return 1;
+}
+
 
 int _debug(const char* msg, int ret) {
   printf("DEBUG: %s\n", msg);
