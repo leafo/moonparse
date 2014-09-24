@@ -3,6 +3,8 @@
 #include <cstring>
 #include <cstdio>
 
+#define DEBUG 0
+
 extern "C" {
 #include <lua.h>
 #include <lualib.h>
@@ -47,10 +49,12 @@ void begin() {
 }
 
 int start(const char* name=0) {
-  if (name) {
-    printf("* starting '%s'\n", name);
-  } else {
-    printf("* starting\n");
+  if (DEBUG) {
+    if (name) {
+      printf("* starting '%s'\n", name);
+    } else {
+      printf("* starting\n");
+    }
   }
 
   lua_pushnil(_l); // slot for the finish object
@@ -59,10 +63,12 @@ int start(const char* name=0) {
 }
 
 int accept(const char* name=0) {
-  if (name) {
-    printf("* accept '%s'\n", name);
-  } else {
-    printf("* accept\n");
+  if (DEBUG) {
+    if (name) {
+      printf("* accept '%s'\n", name);
+    } else {
+      printf("* accept\n");
+    }
   }
 
   int top = pos_stack.top();
@@ -89,10 +95,12 @@ int accept(const char* name=0) {
 }
 
 int reject(const char* name=0) {
-  if (name) {
-    printf("* rejecting '%s'\n", name);
-  } else {
-    printf("* rejecting\n");
+  if (DEBUG) {
+    if (name) {
+      printf("* rejecting '%s'\n", name);
+    } else {
+      printf("* rejecting\n");
+    }
   }
 
   int top = pos_stack.top();
@@ -103,7 +111,10 @@ int reject(const char* name=0) {
 }
 
 int push_string(const char* str) {
-  printf("* pushing '%s'\n", str);
+  if (DEBUG) {
+    printf("* pushing '%s'\n", str);
+  }
+
   lua_pushstring(_l, str);
   return 1;
 }
@@ -111,7 +122,10 @@ int push_string(const char* str) {
 // push a basic tuple on the top of the stack
 // { name, value }
 int push_simple(const char* name, const char* value) {
-  printf("* pushing simple '%s' '%s'\n", name, value);
+  if (DEBUG) {
+    printf("* pushing simple '%s' '%s'\n", name, value);
+  }
+
   lua_newtable(_l);
   lua_pushstring(_l, name);
   lua_rawseti(_l, -2, 1);
@@ -132,47 +146,49 @@ int flatten_last() {
 }
 
 int check_indent(const char* indent) {
-	printf("checking indent: %d\n", strlen(indent));
+  if (DEBUG) {
+    printf("checking indent: %d\n", strlen(indent));
+  }
 
-	if (indent_stack.empty()) {
-		printf(" status: %d\n", 0 == strlen(indent));
-		return 0 == strlen(indent);
-	}
+  if (indent_stack.empty()) {
+    return 0 == strlen(indent);
+  }
 
-	printf(" status: %d\n", indent_stack.top() == strlen(indent));
-	return indent_stack.top() == strlen(indent);
+  return indent_stack.top() == strlen(indent);
 }
 
 int push_indent(const char* indent) {
-	indent_stack.push(strlen(indent));
+  indent_stack.push(strlen(indent));
   return 1;
 }
 
 int pop_indent() {
-	indent_stack.pop();
+  indent_stack.pop();
   return 1;
 }
 
 // only pushes if indent is greater, otherwise fails
 int advance_indent(const char* indent) {
-	int new_indent = strlen(indent);
-	int top = 0;
+  int new_indent = strlen(indent);
+  int top = 0;
 
-	if (!indent_stack.empty()) {
-		top = indent_stack.top();
-	}
+  if (!indent_stack.empty()) {
+    top = indent_stack.top();
+  }
 
-	if (new_indent <= top) {
-		return 0;
-	}
+  if (new_indent <= top) {
+    return 0;
+  }
 
-	indent_stack.push(new_indent);
-	return 1;
+  indent_stack.push(new_indent);
+  return 1;
 }
 
 
 int _debug(const char* msg, int ret) {
-  printf("DEBUG: %s\n", msg);
+  if (DEBUG) {
+    printf("DEBUG: %s\n", msg);
+  }
   return ret;
 }
 
@@ -190,7 +206,9 @@ int parse(lua_State* l) {
 
   set_parse_buffer(input, len);
 
-  printf("input: %s\n", input);
+  if (DEBUG) {
+    printf("input: %s\n", input);
+  }
 
   if (yyparse()) return 1;
   return 0;
