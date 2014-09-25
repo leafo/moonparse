@@ -1,10 +1,12 @@
 .gitignore
 
-: parse2.moon |> moon %f > %o |> parse2.peg
+# CFLAGS += -O2
+
+: parse.peg.moon |> moon %f > %o |> parse.peg
 
 : foreach *.peg |> peg -o%o %f |> %B.h
-: foreach *.cpp | parse.h parse2.h |> g++ -I/usr/include/lua5.1 -O2 -Wall -fPIC -c %f -o %o |> %B.o
-: *.o |> g++ -O2 -shared -o %o -L/usr/lib %f |> moonparse.so
+: foreach *.cpp | parse.h |> g++ -I/usr/include/lua5.1 $(CFLAGS) -Wall -fPIC -c %f -o %o |> %B.o
+: *.o |> g++ $(CFLAGS) -shared -o %o -L/usr/lib %f |> moonparse.so
 
 
 : foreach *.moon |> moonc %f |> %B.lua

@@ -29,14 +29,14 @@ void set_parse_buffer(const char* buffer, const size_t len) {
   parse_buffer_len = len;
 }
 
-void put_input(char* buf, int* result, int max_size) {
+void put_input(char* buf, int* result, size_t max_size) {
   size_t remaining = parse_buffer_len - parse_buffer_pos;
   size_t num_chars = max_size < remaining ? max_size : remaining;
 
   // printf("reading %d chars (max: %d) (pos: %d) (len: %d)\n",
   //     num_chars, max_size, parse_buffer_pos, parse_buffer_len);
 
-  for (int i = 0; i < num_chars; i++) {
+  for (size_t i = 0; i < num_chars; i++) {
     *(buf++) = parse_buffer[parse_buffer_pos++];
   }
 
@@ -147,14 +147,14 @@ int flatten_last() {
 
 int check_indent(const char* indent) {
   if (DEBUG) {
-    printf("checking indent: %d\n", strlen(indent));
+    printf("checking indent: %d\n", (int)strlen(indent));
   }
 
   if (indent_stack.empty()) {
     return 0 == strlen(indent);
   }
 
-  return indent_stack.top() == strlen(indent);
+  return indent_stack.top() == (int)strlen(indent);
 }
 
 int push_indent(const char* indent) {
@@ -194,7 +194,7 @@ int _debug(const char* msg, int ret) {
 
 #define YY_INPUT(buf, result, max_size) put_input(buf, &result, max_size)
 
-#include "parse2.h"
+#include "parse.h"
 
 int parse(lua_State* l) {
   size_t len;
