@@ -58,4 +58,73 @@ if something
 if something then yeah
 ]]
 
+  it "should parse numeric for", ->
+    assert.same {
+      {
+        "for"
+        "i"
+        {
+          {"number", "1"}
+          {"number", "3"}
+        }
+        {
+          {"ref", "okay"}
+        }
+      }
+    }, parse "for i=1,3 do okay"
+
+
+    assert.same {
+      {
+        "for"
+        "i"
+        {
+          {"number", "1"}
+          {"number", "3"}
+        }
+        {
+          {"ref", "okay"}
+        }
+      }
+    }, parse [[
+for i=1,3
+  okay
+]]
+
+
+  it "should parse numeric for with step", ->
+    assert.same {
+      {
+        "for"
+        "i"
+        {
+          {"number", "1"}
+          {"number", "3"}
+          {"ref", "hello"}
+        }
+        {
+          {"ref", "okay"}
+        }
+      }
+    }, parse "for i=1,3,hello do okay"
+
+
+    assert.same {
+      {
+        "for"
+        "i"
+        {
+          {"number", "1"}
+          {"number", "3"}
+          {"ref", "hello"}
+        }
+        {
+          {"ref", "okay"}
+        }
+      }
+    }, parse [[
+for i=1,3,hello
+  okay
+]]
+
 
