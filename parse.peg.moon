@@ -25,17 +25,29 @@ simple = (name, p) ->
 str = (p) ->
   C(p) * Mta"push_string(yytext)"
 
-advance_indent = L C(V"space") * Mta'advance_indent(yytext)'
-check_indent = C(V"space") * Mta'check_indent(yytext)'
+
+_ = V"space"
+alpha_num = S"a-zA-Z_0-9"
+advance_indent = L C(_) * Mta'advance_indent(yytext)'
+check_indent = C(_) * Mta'check_indent(yytext)'
 
 pop_indent = Mta'pop_indent()'
 
 ensure = (p, ensure_with) ->
   p * ensure_with + ensure_with * Mta'0'
 
-
 debug = (msg) ->
   Mta"_debug(\"#{msg}\", 1)"
+
+-- an operator symbol
+sym = (str) -> _ * P(str)
+
+-- a language keyword
+key = (name) -> _ * P(name) * -alpha_num
+
+-- either the single line or a body for a statement
+line_or_body = (prefix) ->
+ key(prefix) * (capture V"exp") + V"break" * V"body"
 
 print build_grammar {
   "start"
@@ -44,21 +56,25 @@ print build_grammar {
   break: "\\n"
   stop: V"break" + -P(1)
 
-  start: V"block" * V"space" * -P(1)
+  start: V"block" * _ * -P(1)
   block: capture V"line" * (V"break" * V"line")^0
 
   line: check_indent * V"statement" + V"empty_line"
-  empty_line: V"space" * L(V"stop") * debug"got empty line"
+  empty_line: _ * L(V"stop") * debug"got empty line"
 
-  value: V"space" * (V"number" + V"ref")
-  ref: simple "ref", S"a-zA-Z_" * S"a-zA-Z_0-9"^0
+  value: _ * (V"number" + V"ref")
+  word: S"a-zA-Z_" * alpha_num^0
+  ref: simple "ref", V"word"
   number: simple "number", S"0-9"^1
 
-  op: V"space" * str(S"-+")
+  op: _ * str(S"-+")
   exp: capture "exp", V"value" * (V"op" * V"value")^0, "flatten_last()"
 
-  statement: (V"if" + V"exp") * V"space" * L(V"stop")
-  if: capture "if", P"if" * V"exp" * V"space" * ( P"then" * (capture V"exp") + V"break" * V"body" )
+  statement: (V"if" + V"for" + V"exp") * _ * L(V"stop")
+  if: capture "if", key"if" * V"exp" * _ * line_or_body"then"
+
+  for: capture "for", key"for" * _ * str(V"word") * sym"=" * V"for_range" * _ * line_or_body"do"
+  for_range: capture V"exp" * sym"," * V"exp" * (sym"," * V"exp")^-1
 
   body: advance_indent * capture ensure V"line" * (V"break" * V"line")^0, pop_indent
 }
