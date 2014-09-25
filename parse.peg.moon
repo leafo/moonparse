@@ -47,7 +47,7 @@ key = (name) -> _ * P(name) * -alpha_num
 
 -- either the single line or a body for a statement
 line_or_body = (prefix) ->
- key(prefix) * (capture V"exp") + V"break" * V"body"
+ _ * key(prefix) * (capture V"exp") + V"break" * V"body"
 
 print build_grammar {
   "start"
@@ -70,11 +70,14 @@ print build_grammar {
   op: _ * str(S"-+")
   exp: capture "exp", V"value" * (V"op" * V"value")^0, "flatten_last()"
 
-  statement: (V"if" + V"for" + V"exp") * _ * L(V"stop")
-  if: capture "if", key"if" * V"exp" * _ * line_or_body"then"
+  statement: (V"if" + V"for" + V"while" + V"exp") * _ * L(V"stop")
 
-  for: capture "for", key"for" * _ * str(V"word") * sym"=" * V"for_range" * _ * line_or_body"do"
+  if: capture "if", key"if" * V"exp" * line_or_body"then"
+
+  for: capture "for", key"for" * _ * str(V"word") * sym"=" * V"for_range" * line_or_body"do"
   for_range: capture V"exp" * sym"," * V"exp" * (sym"," * V"exp")^-1
+
+  while: capture "while", key"while" * V"exp" * line_or_body"do"
 
   body: advance_indent * capture ensure V"line" * (V"break" * V"line")^0, pop_indent
 }

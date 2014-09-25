@@ -91,7 +91,6 @@ for i=1,3
   okay
 ]]
 
-
   it "should parse numeric for with step", ->
     assert.same {
       {
@@ -124,6 +123,31 @@ for i=1,3
       }
     }, parse [[
 for i=1,3,hello
+  okay
+]]
+
+
+  it "should while", ->
+    assert.same {
+      {
+        "while"
+        {"ref", "yeah"}
+        {
+          {"ref", "okay"}
+        }
+      }
+    }, parse "while yeah do okay"
+
+    assert.same {
+      {
+        "while"
+        {"ref", "yeah"}
+        {
+          {"ref", "okay"}
+        }
+      }
+    }, parse [[
+while yeah
   okay
 ]]
 
