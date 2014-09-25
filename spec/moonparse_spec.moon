@@ -17,6 +17,20 @@ describe "moonparse.peg", ->
 hello
 world]]
 
+
+  it "should parse expressions", ->
+    assert.same {
+      {"exp", {"ref", "a"}, "+", {"number", "345"}}
+    }, parse "a + 345"
+
+    assert.same {
+      {"exp", {"number", "3"}, "-", {"number", "5"}}
+      {"exp", {"ref", "a"}, "+", {"ref", "c"}}
+    }, parse [[
+3 - 5
+a + c
+]]
+
   it "should parse if statement", ->
     assert.same {
       {
