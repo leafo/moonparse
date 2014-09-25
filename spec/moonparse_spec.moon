@@ -152,3 +152,30 @@ while yeah
 ]]
 
 
+  it "should parse assign", ->
+    assert.same {
+      {
+        "assign"
+        {
+          {"ref", "a"}
+        }
+        {
+          {"ref", "b"}
+        }
+      }
+    }, parse "a = b"
+
+    assert.same {
+      {
+        "assign"
+        {
+          {"ref", "a"}
+          {"ref", "b"}
+        }
+        {
+          {"ref", "b"}
+          {"ref", "a"}
+        }
+      }
+    }, parse "a,b = b,a"
+

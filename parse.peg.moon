@@ -65,12 +65,15 @@ print build_grammar {
   value: _ * (V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   ref: simple "ref", V"word"
+  ref_list: V"ref" * (sym"," * V"ref")^0
+
   number: simple "number", S"0-9"^1
 
   op: _ * str(S"-+")
   exp: capture "exp", V"value" * (V"op" * V"value")^0, "flatten_last()"
+  exp_list: V"exp" * (sym"," * V"exp")^0
 
-  statement: (V"if" + V"for" + V"while" + V"exp") * _ * L(V"stop")
+  statement: (V"if" + V"for" + V"while" + V"assign" + V"exp") * _ * L(V"stop")
 
   if: capture "if", key"if" * V"exp" * line_or_body"then"
 
@@ -78,6 +81,8 @@ print build_grammar {
   for_range: capture V"exp" * sym"," * V"exp" * (sym"," * V"exp")^-1
 
   while: capture "while", key"while" * V"exp" * line_or_body"do"
+
+  assign: capture "assign", capture(V"ref_list") * sym"=" * capture(V"exp_list")
 
   body: advance_indent * capture ensure V"line" * (V"break" * V"line")^0, pop_indent
 }
