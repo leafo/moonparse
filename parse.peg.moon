@@ -2,6 +2,7 @@
 peg = require "moonparse.peg"
 import V, P, C, S, L, Mta, A, build_grammar from peg
 
+-- runs patterns inside a new capture table (optionally named)
 capture = (name, p, extra_c) ->
   if type(name) == "table"
     extra_c = p
@@ -19,12 +20,16 @@ capture = (name, p, extra_c) ->
 
   Mta"start(#{escaped_name})" * p * Mta(finalize) + Mta"reject(#{escaped_name})"
 
+-- captures pattern into string then creates a 1 element tuple
 simple = (name, p) ->
+  assert name, "missing name for `simple`"
+  assert p, "missing pattern for `simple`"
+
   C(p) * Mta"push_simple(\"#{name}\", yytext)"
 
+-- pushes string capture on stack
 str = (p) ->
   C(p) * Mta"push_string(yytext)"
-
 
 _ = V"space"
 alpha_num = S"a-zA-Z_0-9"
@@ -41,7 +46,11 @@ debug = (msg, pass=true) ->
   Mta"_debug(\"#{msg}\", #{ret}, yy->__pos)"
 
 -- an operator symbol
-sym = (str) -> _ * P(str)
+sym = (str, white=true) ->
+  if white
+    _ * P(str)
+  else
+    P(str)
 
 -- a language keyword
 key = (name) -> _ * P(name) * -alpha_num
@@ -54,6 +63,7 @@ print build_grammar {
   "start"
 
   space: S" \\t"^0
+  some_space: S" \\t"^1
   break: "\\n"
   stop: V"break" + -P(1)
 
@@ -61,9 +71,9 @@ print build_grammar {
   block: capture V"line" * (V"break" * V"line")^0
 
   line: check_indent * V"statement" + V"empty_line"
-  empty_line: _ * L(V"stop") * debug"got empty line"
+  empty_line: _ * L V"stop"
 
-  value: _ * (V"number" + V"ref")
+  value: _ * (V"unbounded_table" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   ref: simple "ref", V"word"
   ref_list: V"ref" * (sym"," * V"ref")^0
@@ -86,4 +96,12 @@ print build_grammar {
   assign: capture "assign", capture(V"ref_list") * sym"=" * capture(V"exp_list")
 
   body: advance_indent * capture ensure V"line" * (V"break" * V"line")^0, pop_indent
+
+  unbounded_table: capture "table", capture V"key_value_list"
+  key_value_list: V"key_value" * (sym"," * V"key_value")^0
+  key_value: V"table_self_assign" + _ * V"table_assign"
+  table_assign: capture simple("key_literal", V"word") * sym(":", false) * V"exp"
+
+  -- TODO: this is lame to match twice, refector the moonscript compiler
+  table_self_assign: sym":" * -V"some_space" * capture capture("key_literal", L(str V"word")) * simple "ref", V"word"
 }

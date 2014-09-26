@@ -179,3 +179,73 @@ while yeah
       }
     }, parse "a,b = b,a"
 
+
+  it "should match unbounded table", ->
+    assert.same {
+      {
+        "table"
+        {
+          {
+            {
+              "key_literal"
+              "hello"
+            }
+            {
+              "ref"
+              "world"
+            }
+          }
+        }
+      }
+    }, parse[[hello: world]]
+
+    assert.same {
+      {
+        "table"
+        {
+          {
+            {
+              "key_literal"
+              "hello"
+            }
+            {
+              "ref"
+              "world"
+            }
+          }
+
+          {
+            {
+              "key_literal"
+              "world"
+            }
+            {
+              "ref"
+              "hello"
+            }
+          }
+
+        }
+      }
+    }, parse[[hello: world, world: hello]]
+
+  it "should match unbounded table self assign", ->
+    assert.same {
+      {
+        "table"
+        {
+          {
+            {
+              "key_literal"
+              "hello"
+            }
+            {
+              "ref"
+              "hello"
+            }
+          }
+        }
+      }
+    }, parse[[:hello]]
+
+
