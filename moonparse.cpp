@@ -2,6 +2,8 @@
 #include <stack>
 #include <cstring>
 #include <cstdio>
+#include <string>
+#include <algorithm>
 
 #define DEBUG 0
 
@@ -184,11 +186,13 @@ int advance_indent(const char* indent) {
   return 1;
 }
 
-
-int _debug(const char* msg, int ret) {
-  if (DEBUG) {
-    printf("DEBUG: %s\n", msg);
-  }
+int _debug(const char* msg, int ret, int yypos) {
+  //if (DEBUG) {
+	printf("DEBUG: %s\n", msg);
+	std::string tmp = parse_buffer;
+	tmp = tmp.substr(yypos, 10);
+	printf(" head: »%s\n", tmp.c_str());
+  //}
   return ret;
 }
 

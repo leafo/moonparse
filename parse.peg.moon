@@ -36,8 +36,9 @@ pop_indent = Mta'pop_indent()'
 ensure = (p, ensure_with) ->
   p * ensure_with + ensure_with * Mta'0'
 
-debug = (msg) ->
-  Mta"_debug(\"#{msg}\", 1)"
+debug = (msg, pass=true) ->
+  ret = pass and "1" or "0"
+  Mta"_debug(\"#{msg}\", #{ret}, yy->__pos)"
 
 -- an operator symbol
 sym = (str) -> _ * P(str)
