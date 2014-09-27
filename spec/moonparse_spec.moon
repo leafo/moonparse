@@ -298,6 +298,49 @@ while yeah
 ]]
 
 
+  it "should parse function with args", ->
+    assert.same {
+      {
+        "fndef"
+        {}
+        {}
+        "slim"
+        {}
+      }
+    }, parse[[()->]]
+    assert.same {
+      {
+        "fndef"
+        {}
+        {}
+        "slim"
+        {}
+      }
+    }, parse[[() ->]]
+
+    assert.same {
+      {
+        "fndef"
+        {
+          { "a" }
+        }
+        {}
+        "slim"
+        {}
+      }
+    }, parse[[(a) ->]]
+    assert.same {
+      {
+        "fndef"
+        {
+          { "a" }
+          { "b" }
+        }
+        {}
+        "slim"
+        {}
+      }
+    }, parse[[(a,b) ->]]
 
 
 

@@ -58,8 +58,7 @@ sym = (str, white=true) ->
 -- a language keyword
 key = (name) -> _ * P(name) * -alpha_num
 
-empty_table = ->
-  capture P"" -- todo make more efficient
+empty_table = capture P"" -- todo make more efficient
 
 -- either the single line or a body for a statement
 line_or_body = (prefix) ->
@@ -116,5 +115,12 @@ print build_grammar {
   -- TODO: this is lame to match twice, refector the moonscript compiler
   table_self_assign: sym":" * -V"some_space" * capture capture("key_literal", L(str V"word")) * simple "ref", V"word"
 
-  fn_lit: capture "fndef", sym"->" * capture(P"") * capture(P"") * str"slim" * (line_or_body! + empty_table!)
+  fn_lit: capture "fndef", V"fn_args" * empty_table * sym"->" * str"slim" * (line_or_body! + empty_table)
+  fn_args: capture V"fn_args_inner"^-1
+  fn_args_inner: sym"(" * (V"fn_arg" * (sym"," * V"fn_arg")^0)^-1 * sym")"
+
+  -- name followed by optional default value
+  fn_arg: capture str(V"word") * (sym"=" * V"exp")^-1
+
+
 }
