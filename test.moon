@@ -5,7 +5,7 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-(a,b,c,d) ->
+(b, a=34) ->
 ]]
 
 old_parse = old.string
