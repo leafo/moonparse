@@ -29,7 +29,10 @@ simple = (name, p) ->
 
 -- pushes string capture on stack
 str = (p) ->
-  C(p) * Mta"push_string(yytext)"
+  if type(p) == "string"
+    Mta"push_string(\"#{p}\")"
+  else
+    C(p) * Mta"push_string(yytext)"
 
 _ = V"space"
 alpha_num = S"a-zA-Z_0-9"
@@ -55,9 +58,17 @@ sym = (str, white=true) ->
 -- a language keyword
 key = (name) -> _ * P(name) * -alpha_num
 
+empty_table = ->
+  capture P"" -- todo make more efficient
+
 -- either the single line or a body for a statement
 line_or_body = (prefix) ->
- _ * key(prefix) * (capture V"exp") + V"break" * V"body"
+  stm = capture V"statement"
+  if prefix
+    stm = key(prefix) * stm
+
+  suffix = stm + V"break" * V"body"
+  _ * suffix
 
 print build_grammar {
   "start"
@@ -73,7 +84,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  value: _ * (V"unbounded_table" + V"number" + V"ref")
+  value: _ * (V"fn_lit" + V"unbounded_table" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   ref: simple "ref", V"word"
   ref_list: V"ref" * (sym"," * V"ref")^0
@@ -104,4 +115,6 @@ print build_grammar {
 
   -- TODO: this is lame to match twice, refector the moonscript compiler
   table_self_assign: sym":" * -V"some_space" * capture capture("key_literal", L(str V"word")) * simple "ref", V"word"
+
+  fn_lit: capture "fndef", sym"->" * capture(P"") * capture(P"") * str"slim" * (line_or_body! + empty_table!)
 }

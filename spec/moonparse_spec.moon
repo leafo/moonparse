@@ -248,4 +248,56 @@ while yeah
       }
     }, parse[[:hello]]
 
+  it "should parse function literal", ->
+    assert.same {
+      {
+        "fndef"
+        { }
+        { }
+        "slim"
+        { }
+      }
+    }, parse[[->]]
+
+    assert.same {
+      {
+        "fndef"
+        { }
+        { }
+        "slim"
+        {
+          {
+            "ref"
+            "hello"
+          }
+        }
+      }
+    }, parse[[-> hello]]
+
+    assert.same {
+      {
+        "fndef"
+        { }
+        { }
+        "slim"
+        {
+          {
+            "ref"
+            "hello"
+          }
+          {
+            "ref"
+            "yeah"
+          }
+        }
+      }
+    }, parse[[
+->
+  hello
+  yeah
+]]
+
+
+
+
 
