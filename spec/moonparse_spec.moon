@@ -343,4 +343,59 @@ while yeah
     }, parse[[(a,b) ->]]
 
 
+  it "should match table", ->
+    assert.same {
+      {
+        "table"
+        {}
+      }
+    }, parse[[{}]]
+
+    assert.same {
+      {
+        "table"
+        {
+          {
+            {"ref", "a"}
+          }
+        }
+      }
+    }, parse[[{a}]]
+
+
+    assert.same {
+      {
+        "table"
+        {
+          { {"ref", "a"} }
+          { {"ref", "b"} }
+        }
+      }
+    }, parse[[{ a,   b,}]]
+
+    assert.same {
+      {
+        "table"
+        {
+          {
+            {"key_literal", "hello"}
+            {"ref", "world"}
+          }
+        }
+      }
+    }, parse[[{ hello: world }]]
+
+    assert.same {
+      {
+        "table"
+        {
+          { {"ref", "a"} }
+          {
+            {"key_literal", "hello"}
+            {"ref", "world"}
+          }
+          { {"ref", "b"} }
+        }
+      }
+    }, parse[[{ a, hello: world, b }]]
 

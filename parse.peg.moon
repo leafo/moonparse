@@ -83,7 +83,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  value: _ * (V"fn_lit" + V"unbounded_table" + V"number" + V"ref")
+  value: _ * (V"table_lit" + V"fn_lit" + V"unbounded_table" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   ref: simple "ref", V"word"
   ref_list: V"ref" * (sym"," * V"ref")^0
@@ -122,5 +122,7 @@ print build_grammar {
   -- name followed by optional default value
   fn_arg: _ * capture str(V"word") * (sym"=" * V"exp")^-1
 
-
+  table_lit: capture "table", sym"{" * capture((V"table_value_list" * sym","^-1)^-1) * sym"}"
+  table_value_list: V"table_value" * (sym"," * V"table_value")^0
+  table_value: V"key_value" + capture V"exp"
 }
