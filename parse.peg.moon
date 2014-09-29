@@ -40,6 +40,7 @@ advance_indent = L C(_) * Mta'advance_indent(yytext)'
 check_indent = C(_) * Mta'check_indent(yytext)'
 
 pop_indent = Mta'pop_indent()'
+push_indent = C(_) * Mta'push_indent(yytext)'
 
 ensure = (p, ensure_with) ->
   p * ensure_with + ensure_with * Mta'0'
@@ -118,11 +119,13 @@ print build_grammar {
   fn_lit: capture "fndef", V"fn_args" * empty_table * sym"->" * str"slim" * (line_or_body! + empty_table)
   fn_args: capture V"fn_args_inner"^-1
   fn_args_inner: sym"(" * (V"fn_arg" * (sym"," * V"fn_arg")^0)^-1 * sym")"
+  fn_lit_peek: L _ * S"-("
 
   -- name followed by optional default value
   fn_arg: _ * capture str(V"word") * (sym"=" * V"exp")^-1
 
-  table_lit: capture "table", sym"{" * capture((V"table_value_list" * sym","^-1)^-1) * sym"}"
+  table_lit: capture "table", sym"{" * capture((V"table_value_list" * sym","^-1)^-1 * V"table_lit_line"^0) * sym"}"
   table_value_list: V"table_value" * (sym"," * V"table_value")^0
   table_value: V"key_value" + capture V"exp"
+  table_lit_line: _ * V"break" * (push_indent * ensure(V"table_value_list", pop_indent) + _)
 }

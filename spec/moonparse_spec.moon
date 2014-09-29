@@ -343,7 +343,7 @@ while yeah
     }, parse[[(a,b) ->]]
 
 
-  it "should match table", ->
+  it "should parse single line table", ->
     assert.same {
       {
         "table"
@@ -398,4 +398,55 @@ while yeah
         }
       }
     }, parse[[{ a, hello: world, b }]]
+
+
+  it "should parse multi line table", ->
+    assert.same {
+      {
+        "table"
+        {}
+      }
+    }, parse [[
+{
+  
+}
+]]
+
+    assert.same {
+      {
+        "table"
+        {
+          { {"ref", "a"} }
+          { {"ref", "b"} }
+        }
+      }
+    }, parse [[
+{
+a
+b
+}
+]]
+
+
+    assert.same {
+      {
+        "table"
+        {
+          {
+            {"key_literal", "hello"}
+            {"ref", "world"}
+          }
+          { {"ref", "a"} }
+          {
+            {"key_literal", "foo"}
+            {"ref", "bar"}
+          }
+        }
+      }
+    }, parse [[
+{
+  hello: world, a
+foo: bar
+}
+]]
 
