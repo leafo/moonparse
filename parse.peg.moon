@@ -120,7 +120,7 @@ print build_grammar {
   fn_args_inner: sym"(" * (V"fn_arg" * (sym"," * V"fn_arg")^0)^-1 * sym")"
 
   -- name followed by optional default value
-  fn_arg: capture str(V"word") * (sym"=" * V"exp")^-1
+  fn_arg: _ * capture str(V"word") * (sym"=" * V"exp")^-1
 
 
 }
