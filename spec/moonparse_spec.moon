@@ -450,3 +450,18 @@ foo: bar
 }
 ]]
 
+  it "should parse chain", ->
+    assert.same {
+      {
+        "chain"
+        { "ref", "one" }
+        { "dot", "hello" }
+        { "call", {
+          {"ref", "world"}
+          {"exp", {"ref", "foo"}, "+", {"ref", "bar"}}
+          {"chain", {"ref", "boba"}, {"call", {
+            {"ref", "cat"}
+          }}}
+        }}
+      }
+    }, parse[[one.hello world, foo + bar, boba cat]]

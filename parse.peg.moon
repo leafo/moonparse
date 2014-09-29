@@ -2,6 +2,8 @@
 peg = require "moonparse.peg"
 import V, P, C, S, L, Mta, A, build_grammar from peg
 
+-- TODO: negating a set should make it non consuming!! -alpha_num
+
 -- runs patterns inside a new capture table (optionally named)
 capture = (name, p, extra_c) ->
   if type(name) == "table"
@@ -70,6 +72,22 @@ line_or_body = (prefix) ->
   suffix = stm + V"break" * V"body"
   _ * suffix
 
+keywords = {"if", "then", "for", "do", "while"}
+
+reduce = (list, op="mul") ->
+  pat = list[1]
+  for i=2,#list
+    switch op
+      when "mul"
+        pat = pat * list[i]
+      when "add"
+        pat = pat + list[i]
+      else
+        error "unknown op: #{op}"
+  pat
+
+not_keyword = -(reduce([P k for k in *keywords], "add") * -alpha_num)
+
 print build_grammar {
   "start"
 
@@ -84,7 +102,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  value: _ * (V"table_lit" + V"fn_lit" + V"unbounded_table" + V"number" + V"ref")
+  value: _ * (V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   ref: simple "ref", V"word"
   ref_list: V"ref" * (sym"," * V"ref")^0
@@ -128,4 +146,8 @@ print build_grammar {
   table_value_list: V"table_value" * (sym"," * V"table_value")^0
   table_value: V"key_value" + capture V"exp"
   table_lit_line: _ * V"break" * (push_indent * ensure(V"table_value_list", pop_indent) + _)
+
+  chain: capture "chain", not_keyword * V"ref" * (V"chain_dot" + V"chain_call")^1
+  chain_dot: capture "dot", sym(".", false) * str V"word"
+  chain_call: capture "call", V"some_space" * not_keyword * capture V"exp_list"
 }

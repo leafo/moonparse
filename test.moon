@@ -5,8 +5,10 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-(b, a=34) ->
+if something then yeah
 ]]
+
+-- one.hello world, foo + bar, boba cat
 
 old_parse = old.string
 
