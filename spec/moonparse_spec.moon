@@ -408,7 +408,7 @@ while yeah
       }
     }, parse [[
 {
-  
+
 }
 ]]
 
@@ -465,3 +465,25 @@ foo: bar
         }}
       }
     }, parse[[one.hello world, foo + bar, boba cat]]
+
+
+  it "should parse simple string", ->
+    assert.same {
+      {
+        "string"
+        '"'
+        "he'llo"
+      }
+    }, parse[["he'llo"]]
+
+    assert.same {
+      {
+        "string"
+        "'"
+        'he"llo'
+      }
+    }, parse[['he"llo']]
+
+
+
+

@@ -32,6 +32,7 @@ simple = (name, p) ->
 -- pushes string capture on stack
 str = (p) ->
   if type(p) == "string"
+    p = p\gsub '"', '\\"'
     Mta"push_string(\"#{p}\")"
   else
     C(p) * Mta"push_string(yytext)"
@@ -88,6 +89,9 @@ reduce = (list, op="mul") ->
 
 not_keyword = -(reduce([P k for k in *keywords], "add") * -alpha_num)
 
+simple_string = (d) ->
+  sym(d) * str(d) * str((-P(d) * P(1))^0) * sym(d, false)
+
 print build_grammar {
   "start"
 
@@ -102,7 +106,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  value: _ * (V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
+  value: _ * (V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   ref: simple "ref", V"word"
   ref_list: V"ref" * (sym"," * V"ref")^0
@@ -151,4 +155,8 @@ print build_grammar {
   chain_dot: capture "dot", sym(".", false) * str V"word"
   chain_call: capture "call", V"some_space" * not_keyword * capture V"exp_list"
   chain_peek: L V"word" * (V"some_space" * S"a-zA-Z_" + P".")
+
+  string: capture "string", V"string_double" + V"string_single"
+  string_double: simple_string '"'
+  string_single: simple_string "'"
 }
