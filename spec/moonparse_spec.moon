@@ -485,5 +485,18 @@ foo: bar
     }, parse[['he"llo']]
 
 
+  it "should parse string interpolation", ->
+    assert.same {
+      {
+        "string"
+        '"'
+        "he"
+        {
+          "interpolation"
+          { "ref", "a" }
+        }
+        "llo"
+      }
+    }, parse[["he#{a}llo"]]
 
 

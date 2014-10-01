@@ -89,8 +89,14 @@ reduce = (list, op="mul") ->
 
 not_keyword = -(reduce([P k for k in *keywords], "add") * -alpha_num)
 
-simple_string = (d) ->
-  sym(d) * str(d) * str((-P(d) * P(1))^0) * sym(d, false)
+simple_string = (d, allow_interpolation) ->
+  inside = if allow_interpolation
+    interp = V"string_interpolation"
+    (interp + str (-P(d) * -P'#{' * P(1))^1)^0
+  else
+    str (-P(d) * P(1))^0
+
+  sym(d) * str(d) * inside * sym(d, false)
 
 print build_grammar {
   "start"
@@ -157,6 +163,8 @@ print build_grammar {
   chain_peek: L V"word" * (V"some_space" * S"a-zA-Z_" + P".")
 
   string: capture "string", V"string_double" + V"string_single"
-  string_double: simple_string '"'
+  string_double: simple_string '"', true
   string_single: simple_string "'"
+
+  string_interpolation: sym('#{', false) * capture "interpolation", V"exp" * sym"}"
 }
