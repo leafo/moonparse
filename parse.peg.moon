@@ -90,11 +90,13 @@ reduce = (list, op="mul") ->
 not_keyword = -(reduce([P k for k in *keywords], "add") * -alpha_num)
 
 simple_string = (d, allow_interpolation) ->
+  escape = P"\\\\\\#{d}" -- wow lol
+
   inside = if allow_interpolation
     interp = V"string_interpolation"
-    (interp + str (-P(d) * -P'#{' * P(1))^1)^0
+    (interp + str (-P(d) * -P'#{' * (escape + P(1)))^1)^0
   else
-    str (-P(d) * P(1))^0
+    str (-P(d) * (escape + P(1)))^0
 
   sym(d) * str(d) * inside * sym(d, false)
 

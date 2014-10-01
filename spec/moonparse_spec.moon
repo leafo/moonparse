@@ -500,3 +500,22 @@ foo: bar
     }, parse[["he#{a}llo"]]
 
 
+
+  it "should parse escape sequence", ->
+    assert.same {
+      {
+        "string"
+        "'"
+        [[h\'e]]
+      }
+    }, parse[['h\'e']]
+
+    assert.same {
+      {
+        "string"
+        '"'
+        [[h\"e]]
+      }
+    }, parse[["h\"e"]]
+
+
