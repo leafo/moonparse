@@ -161,7 +161,9 @@ print build_grammar {
 
   chain: capture "chain", not_keyword * V"ref" * (V"chain_dot" + V"chain_call")^1
   chain_dot: capture "dot", sym(".", false) * str V"word"
-  chain_call: capture "call", V"some_space" * not_keyword * capture V"exp_list"
+  chain_call: capture "call", V"chain_call_open" + V"chain_call_parens"
+  chain_call_open: V"some_space" * not_keyword * capture V"exp_list"
+  chain_call_parens: sym("(", false) * capture(V"exp_list"^-1) *sym ")"
   chain_peek: L V"word" * (V"some_space" * S"a-zA-Z_" + P".")
 
   string: capture "string", V"string_double" + V"string_single"

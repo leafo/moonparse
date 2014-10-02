@@ -519,3 +519,37 @@ foo: bar
     }, parse[["h\"e"]]
 
 
+
+  it "should parse function with parens", ->
+    assert.same {
+      {
+        "chain"
+        {"ref", "hello"}
+        {"call", {}}
+      }
+    }, parse[[hello(   )]]
+
+    assert.same {
+      {
+        "chain"
+        {"ref", "hello"}
+        {"call", {
+          {"ref", "a"}
+        }}
+      }
+    }, parse[[hello( a )]]
+
+    assert.same {
+      {
+        "chain"
+        {"ref", "hello"}
+        {"call", {
+          {"ref", "a"}
+          {"ref", "b"}
+        }}
+
+        {"call", { }}
+      }
+    }, parse[[hello( a,b )()]]
+
+
