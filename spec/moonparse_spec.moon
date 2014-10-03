@@ -552,4 +552,37 @@ foo: bar
       }
     }, parse[[hello( a,b )()]]
 
+  it "should parse basic generic for comprehension", ->
+    assert.same {
+      {
+        "comprehension"
+        { "ref", "x" }
+        {
+          {
+            "foreach"
+            {"x"}
+            {"ref", "y"}
+          }
+        }
+      }
+    }, parse"[x for x in y]"
+
+
+  it "should parse basic numeric for comprehension", ->
+    assert.same {
+      {
+        "comprehension"
+        { "ref", "x" }
+        {
+          {
+            "for"
+            "x"
+            {
+              {"ref", "a"}
+              {"ref", "b"}
+            }
+          }
+        }
+      }
+    }, parse"[x for x=a,b]"
 

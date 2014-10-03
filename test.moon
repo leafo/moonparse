@@ -5,9 +5,8 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-hello(  )
-hello( a )
-hello( a,b )()
+[x for x in y]
+[x for x=1,2]
 ]]
 
 -- one.hello world, foo + bar, boba cat
