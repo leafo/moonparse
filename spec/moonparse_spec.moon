@@ -586,3 +586,51 @@ foo: bar
       }
     }, parse"[x for x=a,b]"
 
+
+  it "should parse basic class", ->
+  assert.same {
+    {
+      "class"
+      "Thing"
+      ""
+      {
+        {
+          "props"
+          {
+            { "key_literal", "color" }
+            { "ref", "blue" }
+          }
+        }
+      }
+    }
+  }, parse [[class Thing
+  color: blue]]
+
+
+  assert.same {
+    {
+      "class"
+      "Thing"
+      ""
+      {
+        {
+          "props"
+          {
+            { "key_literal", "color" }
+            { "ref", "blue" }
+          }
+        }
+
+        {
+          "props"
+          {
+            { "key_literal", "height" }
+            { "number", "123" }
+          }
+        }
+      }
+    }
+  }, parse [[class Thing
+  color: blue
+  height: 123]]
+

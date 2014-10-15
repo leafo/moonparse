@@ -114,7 +114,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  value: _ * (V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
+  value: _ * (V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   word_list: str(V"word") * (sym"," * str(V"word"))^0
 
@@ -180,4 +180,9 @@ print build_grammar {
   comprehension_foreach: key"for" * _ * capture "foreach", capture(V"word_list") * key"in" * V"exp"
   comprehension_for: key"for" * capture "for", str(V"word") * sym"=" * V"for_range"
 
+  class_decl: key"class" * _ * capture "class", str(V"word") * str"" * _ * V"class_block"
+  class_block: (_ * V"break")^1 * advance_indent * ensure V"class_lines", pop_indent
+  class_lines: capture V"class_line" * ((_ * V"break")^1 * V"class_line")^0
+
+  class_line: capture "props", V"key_value_list"
 }

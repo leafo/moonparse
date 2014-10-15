@@ -5,8 +5,9 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-[x for x in y]
-[x for x=1,2]
+class Thing
+  color: blue
+  height: 123
 ]]
 
 -- one.hello world, foo + bar, boba cat
