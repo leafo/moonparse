@@ -4,6 +4,8 @@ import V, P, C, S, L, Mta, A, build_grammar from peg
 
 -- TODO: negating a set should make it non consuming!! -alpha_num
 
+-- class extends should prevent indent before being parsed
+
 -- runs patterns inside a new capture table (optionally named)
 capture = (name, p, extra_c) ->
   if type(name) == "table"
@@ -185,5 +187,5 @@ print build_grammar {
   class_block: (_ * V"break")^1 * advance_indent * ensure V"class_lines", pop_indent
   class_lines: capture V"class_line" * ((_ * V"break")^1 * V"class_line")^0
 
-  class_line: capture "props", V"key_value_list"
+  class_line: capture("props", V"key_value_list") + capture("stm", V"statement" + V"exp")
 }

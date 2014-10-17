@@ -6,8 +6,8 @@ old = require "moonscript.parse"
 
 code = [[
 class Thing extends Hello
-  color: blue
-  height: 123
+  if cool
+    print "hello"
 ]]
 
 -- one.hello world, foo + bar, boba cat

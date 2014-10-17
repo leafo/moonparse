@@ -653,3 +653,33 @@ foo: bar
     }, parse [[class Thing extends 123
     color: blue]]
 
+
+  it "should parse class with expressions in body", ->
+    assert.same {
+      {
+        "class"
+        "Thing"
+        { "ref", "Hello" }
+        {
+          {
+            "stm"
+            {
+              "if"
+              {"ref", "cool"}
+              {
+                {
+                  "chain"
+                  {"ref", "print"}
+                  {"call", {
+                    {"string", '"', "hello"}
+                  }}
+                }
+              }
+            }
+          }
+        }
+      }
+    }, parse [[class Thing extends Hello
+  if cool
+    print "hello"]]
+
