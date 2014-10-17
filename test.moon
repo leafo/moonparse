@@ -5,7 +5,7 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-class Thing
+class Thing extends Hello
   color: blue
   height: 123
 ]]

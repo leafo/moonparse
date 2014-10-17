@@ -588,49 +588,68 @@ foo: bar
 
 
   it "should parse basic class", ->
-  assert.same {
-    {
-      "class"
-      "Thing"
-      ""
+    assert.same {
       {
+        "class"
+        "Thing"
+        ""
         {
-          "props"
           {
-            { "key_literal", "color" }
-            { "ref", "blue" }
+            "props"
+            {
+              { "key_literal", "color" }
+              { "ref", "blue" }
+            }
           }
         }
       }
-    }
-  }, parse [[class Thing
-  color: blue]]
+    }, parse [[class Thing
+    color: blue]]
 
 
-  assert.same {
-    {
-      "class"
-      "Thing"
-      ""
+    assert.same {
       {
+        "class"
+        "Thing"
+        ""
         {
-          "props"
           {
-            { "key_literal", "color" }
-            { "ref", "blue" }
+            "props"
+            {
+              { "key_literal", "color" }
+              { "ref", "blue" }
+            }
           }
-        }
 
-        {
-          "props"
           {
-            { "key_literal", "height" }
-            { "number", "123" }
+            "props"
+            {
+              { "key_literal", "height" }
+              { "number", "123" }
+            }
           }
         }
       }
-    }
-  }, parse [[class Thing
-  color: blue
-  height: 123]]
+    }, parse [[class Thing
+    color: blue
+    height: 123]]
+
+  it "should parse class with extends", ->
+    assert.same {
+      {
+        "class"
+        "Thing"
+        { "number", "123" }
+        {
+          {
+            "props"
+            {
+              { "key_literal", "color" }
+              { "ref", "blue" }
+            }
+          }
+        }
+      }
+    }, parse [[class Thing extends 123
+    color: blue]]
 

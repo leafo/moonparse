@@ -180,7 +180,8 @@ print build_grammar {
   comprehension_foreach: key"for" * _ * capture "foreach", capture(V"word_list") * key"in" * V"exp"
   comprehension_for: key"for" * capture "for", str(V"word") * sym"=" * V"for_range"
 
-  class_decl: key"class" * _ * capture "class", str(V"word") * str"" * _ * V"class_block"
+  class_decl: key"class" * _ * capture "class", str(V"word") * (V"class_extends" + str"") * _ * V"class_block"
+  class_extends: key"extends" * _ * V"exp"
   class_block: (_ * V"break")^1 * advance_indent * ensure V"class_lines", pop_indent
   class_lines: capture V"class_line" * ((_ * V"break")^1 * V"class_line")^0
 
