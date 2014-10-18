@@ -1,0 +1,3 @@
+.gitignore
+: moonparse.moon |> echo '#!/usr/bin/env lua' > %o; moonc -p %f >> %o; chmod +x %o |> moonparse
+
