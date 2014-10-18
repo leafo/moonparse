@@ -75,7 +75,15 @@ line_or_body = (prefix) ->
   suffix = stm + V"break" * V"body"
   _ * suffix
 
-keywords = {"if", "then", "for", "do", "while"}
+keywords = {
+  "class"
+  "do"
+  "for"
+  "if"
+  "import"
+  "then"
+  "while"
+}
 
 reduce = (list, op="mul") ->
   pat = list[1]
@@ -116,7 +124,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  value: _ * (V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
+  value: _ * (V"import" + V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
   word: S"a-zA-Z_" * alpha_num^0
   word_list: str(V"word") * (sym"," * str(V"word"))^0
 
@@ -188,4 +196,8 @@ print build_grammar {
   class_lines: capture V"class_line" * ((_ * V"break")^1 * V"class_line")^0
 
   class_line: capture("props", V"key_value_list") + capture("stm", V"statement" + V"exp")
+
+  import: key"import" * capture "import", capture(V"import_names") * key"from" * V"exp"
+  import_names: V"import_name" * (sym"," * V"import_name")^0
+  import_name: sym"\\\\" * capture("colon_stub", str(V"word")) + str(V"word")
 }

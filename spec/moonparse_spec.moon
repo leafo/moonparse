@@ -683,3 +683,32 @@ foo: bar
   if cool
     print "hello"]]
 
+
+  it "should parse import", ->
+    assert.same {
+      {
+        "import"
+        {
+          "a"
+          "b"
+          "c"
+        }
+        { "ref", "hello" }
+      }
+    }, parse [[import a,b,c from hello]]
+
+    assert.same {
+      {
+        "import"
+        {
+          "a"
+          {
+            "colon_stub"
+            "b"
+          }
+          "c"
+        }
+        { "ref", "hello" }
+      }
+    }, parse [[import a,\b,c from hello]]
+
