@@ -12,13 +12,8 @@ description = {
   license = "MIT"
 }
 
-
 build = {
 	type = "builtin",
-
-  variables = {
-    CC = "g++"
-  },
 
   modules = {
     ["moonparse.peg"] = "moonparse/peg.lua",
