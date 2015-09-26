@@ -2,8 +2,6 @@
 peg = require "moonparse.peg"
 import V, P, C, S, L, Mta, A, build_grammar from peg
 
--- TODO: negating a set should make it non consuming!! -alpha_num
-
 -- class extends should prevent indent before being parsed
 
 -- runs patterns inside a new capture table (optionally named)
@@ -110,6 +108,8 @@ simple_string = (d, allow_interpolation) ->
 
   sym(d) * str(d) * inside * sym(d, false)
 
+word = S"a-zA-Z_" * alpha_num^0
+
 print build_grammar {
   "start"
 
@@ -125,10 +125,11 @@ print build_grammar {
   empty_line: _ * L V"stop"
 
   value: _ * (V"import" + V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
-  word: S"a-zA-Z_" * alpha_num^0
-  word_list: str(V"word") * (sym"," * str(V"word"))^0
 
-  ref: simple "ref", V"word"
+  word: _ * str word
+  word_list: V"word" * (sym"," * V"word")^0
+
+  ref: _ * simple "ref", word
   ref_list: V"ref" * (sym"," * V"ref")^0
 
   number: simple "number", S"0-9"^1
@@ -141,7 +142,7 @@ print build_grammar {
 
   if: capture "if", key"if" * V"exp" * line_or_body"then"
 
-  for: capture "for", key"for" * _ * str(V"word") * sym"=" * V"for_range" * line_or_body"do"
+  for: capture "for", key"for" * V"word" * sym"=" * V"for_range" * line_or_body"do"
   for_range: capture V"exp" * sym"," * V"exp" * (sym"," * V"exp")^-1
 
   while: capture "while", key"while" * V"exp" * line_or_body"do"
@@ -153,10 +154,10 @@ print build_grammar {
   unbounded_table: capture "table", capture V"key_value_list"
   key_value_list: V"key_value" * (sym"," * V"key_value")^0
   key_value: V"table_self_assign" + _ * V"table_assign"
-  table_assign: capture simple("key_literal", V"word") * sym(":", false) * V"exp"
+  table_assign: capture simple("key_literal", word) * sym(":", false) * V"exp"
 
   -- TODO: this is lame to match twice, refector the moonscript compiler
-  table_self_assign: sym":" * -V"some_space" * capture capture("key_literal", L(str V"word")) * simple "ref", V"word"
+  table_self_assign: sym":" * -V"some_space" * capture capture("key_literal", L(str word)) * V"ref"
 
   fn_lit: capture "fndef", V"fn_args" * empty_table * sym"->" * str"slim" * (line_or_body! + empty_table)
   fn_args: capture V"fn_args_inner"^-1
@@ -164,7 +165,7 @@ print build_grammar {
   fn_lit_peek: L _ * S"-("
 
   -- name followed by optional default value
-  fn_arg: _ * capture str(V"word") * (sym"=" * V"exp")^-1
+  fn_arg: capture V"word" * (sym"=" * V"exp")^-1
 
   table_lit: capture "table", sym"{" * capture((V"table_value_list" * sym","^-1)^-1 * V"table_lit_line"^0) * sym"}"
   table_value_list: V"table_value" * (sym"," * V"table_value")^0
@@ -172,11 +173,11 @@ print build_grammar {
   table_lit_line: _ * V"break" * (push_indent * ensure(V"table_value_list", pop_indent) + _)
 
   chain: capture "chain", not_keyword * V"ref" * (V"chain_dot" + V"chain_call")^1
-  chain_dot: capture "dot", sym(".", false) * str V"word"
+  chain_dot: capture "dot", sym(".", false) * str word
   chain_call: capture "call", V"chain_call_open" + V"chain_call_parens"
   chain_call_open: V"some_space" * not_keyword * capture V"exp_list"
   chain_call_parens: sym("(", false) * capture(V"exp_list"^-1) *sym ")"
-  chain_peek: L V"word" * (V"some_space" * S"a-zA-Z_" + P".")
+  chain_peek: L word * (V"some_space" * S"a-zA-Z_" + P".")
 
   string: capture "string", V"string_double" + V"string_single"
   string_double: simple_string '"', true
@@ -188,9 +189,9 @@ print build_grammar {
   comprehension_loop: capture V"comprehension_foreach" + V"comprehension_for"
 
   comprehension_foreach: key"for" * _ * capture "foreach", capture(V"word_list") * key"in" * V"exp"
-  comprehension_for: key"for" * capture "for", str(V"word") * sym"=" * V"for_range"
+  comprehension_for: key"for" * capture "for", V"word" * sym"=" * V"for_range"
 
-  class_decl: key"class" * _ * capture "class", str(V"word") * (V"class_extends" + str"") * _ * V"class_block"
+  class_decl: key"class" * _ * capture "class", V"word" * (V"class_extends" + str"") * _ * V"class_block"
   class_extends: key"extends" * _ * V"exp"
   class_block: (_ * V"break")^1 * advance_indent * ensure V"class_lines", pop_indent
   class_lines: capture V"class_line" * ((_ * V"break")^1 * V"class_line")^0
@@ -199,5 +200,5 @@ print build_grammar {
 
   import: key"import" * capture "import", capture(V"import_names") * key"from" * V"exp"
   import_names: V"import_name" * (sym"," * V"import_name")^0
-  import_name: sym"\\\\" * capture("colon_stub", str(V"word")) + str(V"word")
+  import_name: sym"\\\\" * capture("colon_stub", str(word)) + _ * V"word"
 }
