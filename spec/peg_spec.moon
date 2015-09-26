@@ -54,7 +54,8 @@ describe "moonparse.peg", ->
     same [[! "hello"]], -P"hello"
     same [[! hello]], -V"hello"
     same [[! ( hello world )]], -(V"hello" * V"world")
-    same "[^abcd]", -S "abcd"
+    -- same "[^abcd]", -S "abcd"
+    same "! [abcd]", -S "abcd"
 
 
 

@@ -69,14 +69,6 @@ class Negate extends UnaryOp
   new: (val) =>
     super val, "!", false
 
-  __tostring: =>
-    if @val.__class == Set
-      set = Set @val.val
-      set.negate = true
-      return tostring set
-
-    UnaryOp.__tostring @
-
 RepeatOp = (a, b) ->
   assert type(b), "number"
 
