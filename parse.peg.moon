@@ -124,6 +124,8 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
+  comment: _ * P"--" * (P(1) - V"break")^0
+
   value: _ * (V"import" + V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
 
   word: _ * str word
