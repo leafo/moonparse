@@ -113,7 +113,7 @@ word = S"a-zA-Z_" * alpha_num^0
 print build_grammar {
   "start"
 
-  space: S" \\t"^0
+  space: S" \\t"^0 + V"comment"
   some_space: S" \\t"^1
   break: "\\n"
   stop: V"break" + -P(1)
