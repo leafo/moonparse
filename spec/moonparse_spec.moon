@@ -712,3 +712,36 @@ foo: bar
       }
     }, parse [[import a,\b,c from hello]]
 
+
+  it "parses comments", ->
+    empty = {
+[[--hello world]]
+[[
+
+--hello world]]
+[[--hello world
+]]
+[[
+
+  -- what
+  
+  ]]
+    }
+
+    for e in *empty
+      assert.same { }, parse e
+
+    assert.same {
+      { "ref", "hello" }
+    }, parse [[hello -- world]]
+
+    assert.same {
+      { "ref", "hello" }
+      { "ref", "yeah" }
+    }, parse [[
+hello -- world
+-- what
+yeah
+]]
+
+

@@ -113,7 +113,7 @@ word = S"a-zA-Z_" * alpha_num^0
 print build_grammar {
   "start"
 
-  space: S" \\t"^0 + V"comment"
+  space: S" \\t"^0 * (V"comment")^-1
   some_space: S" \\t"^1
   break: "\\n"
   stop: V"break" + -P(1)
@@ -124,7 +124,7 @@ print build_grammar {
   line: check_indent * V"statement" + V"empty_line"
   empty_line: _ * L V"stop"
 
-  comment: _ * P"--" * (P(1) - V"break")^0
+  comment: P"--" * (P(1) - V"break")^0
 
   value: _ * (V"import" + V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
 
