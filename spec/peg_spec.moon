@@ -18,6 +18,13 @@ describe "moonparse.peg", ->
       same "", P(0)
 
   it "sequence", ->
+    same '"hello" "world"', P"hello" * P"world"
+
+  it "alternate", ->
+    same '"hello" / "world"', P"hello" + P"world"
+
+  it "sub", ->
+    same '! "hello" .', P(1) - P"hello"
 
   it "pow", ->
     same "hello *",V"hello"^0

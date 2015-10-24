@@ -10,7 +10,7 @@ class Node
       child.__base[o] = @__base[o]
 
   __add: (a,b) -> AlternateOp a,b
-  __sub: (a,b) -> error "no sub yet"
+  __sub: (a,b) -> SequenceOp Negate(b), a
   __mul: (a,b) -> SequenceOp a,b
   __div: (a,b) -> error "divide not defined"
   __pow: (a,b) -> RepeatOp a,b
