@@ -450,7 +450,7 @@ foo: bar
 }
 ]]
 
-  it "should parse chain", ->
+  it "should parse chain with dot", ->
     assert.same {
       {
         "chain"
@@ -477,6 +477,23 @@ foo: bar
         {"dot", "zone"}
       }
     }, parse [[yeah.cool!.zone]]
+
+  it "should parse chain with index", ->
+    assert.same {
+      {
+        "chain"
+        {"ref", "one"}
+        {"index", {"ref", "two"}}
+        {"dot", "three"}
+        {"index", {
+          "exp"
+          {"number", "1"}
+          "+"
+          {"number", "2"}
+        }}
+        {"call", {}}
+     }
+    }, parse "one[two].three[1+2]!"
 
   it "should parse simple string", ->
     assert.same {

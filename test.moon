@@ -5,7 +5,7 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-world!.butt
+world[yeah]
 ]]
 
 -- one.hello world, foo + bar, boba cat

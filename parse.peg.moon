@@ -176,8 +176,10 @@ print build_grammar {
   table_value: V"key_value" + capture V"exp"
   table_lit_line: _ * V"break" * (push_indent * ensure(V"table_value_list", pop_indent) + _)
 
-  chain: capture "chain", not_keyword * V"ref" * (V"chain_dot" + V"chain_call")^1
+  chain: capture "chain", not_keyword * V"ref" * (V"chain_dot" + V"chain_call" + V"chain_index")^1
+  -- TODO: benchmark moving the captures past the first char
   chain_dot: capture "dot", sym(".", false) * str word
+  chain_index: capture "index", sym("[", false) * V"exp" * sym"]"
   chain_call: capture "call", V"chain_call_open" + V"chain_call_parens" + V"chain_call_bang"
   chain_call_open: V"some_space" * not_keyword * capture V"exp_list"
   chain_call_parens: sym("(", false) * capture(V"exp_list"^-1) * sym ")"
