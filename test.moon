@@ -5,7 +5,7 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-world[yeah]
+k + (a - zeta)
 ]]
 
 -- one.hello world, foo + bar, boba cat
@@ -27,3 +27,23 @@ print (assert compile.tree tree)
 print "\n=== Classic compile ==="
 print (assert compile.tree old.string code)
 
+-- syntax not implemented: 
+[[
+(okay) "world"
+(cool)(fool)
+"one"\dog!
+x = if something then "yes"
+{a} = {1}
+
+with thing
+  one
+
+print \one
+
+[==[WHOA!]==]
+
+{"yes": "no"}
+{[yes]: "no"}
+
+a * b -- missing other operators
+]]
