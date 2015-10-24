@@ -703,7 +703,7 @@ foo: bar
         {
           "a"
           {
-            "colon_stub"
+            "colon"
             "b"
           }
           "c"

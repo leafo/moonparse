@@ -5,7 +5,7 @@ import parse from require "moonparse"
 old = require "moonscript.parse"
 
 code = [[
-import \hi from hello
+import \hi, world from hello
 ]]
 
 -- one.hello world, foo + bar, boba cat

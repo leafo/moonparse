@@ -202,5 +202,5 @@ print build_grammar {
 
   import: key"import" * capture "import", capture(V"import_names") * key"from" * V"exp"
   import_names: V"import_name" * (sym"," * V"import_name")^0
-  import_name: sym"\\\\" * capture("colon_stub", str(word)) + _ * V"word"
+  import_name: sym"\\\\" * capture("colon", str(word)) + _ * V"word"
 }
