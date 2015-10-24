@@ -495,6 +495,26 @@ foo: bar
      }
     }, parse "one[two].three[1+2]!"
 
+  it "should parse chain with colon", ->
+    assert.same {
+      {
+        "chain"
+        {"ref", "a"}
+        {"colon", "b"}
+        {"call", {}}
+     }
+    }, parse [[a\b!]]
+
+    assert.same {
+      {
+        "chain"
+        {"ref", "oh"}
+        {"colon", "so"}
+        {"colon", "butt"}
+     }
+    }, parse [[oh\so\butt]]
+
+
   it "should parse simple string", ->
     assert.same {
       {
