@@ -29,6 +29,8 @@ simple = (name, p) ->
 
   C(p) * Mta"push_simple(\"#{name}\", yytext)"
 
+empty = -> Mta"push_empty()"
+
 -- pushes string capture on stack
 str = (p) ->
   if type(p) == "string"
@@ -176,9 +178,10 @@ print build_grammar {
 
   chain: capture "chain", not_keyword * V"ref" * (V"chain_dot" + V"chain_call")^1
   chain_dot: capture "dot", sym(".", false) * str word
-  chain_call: capture "call", V"chain_call_open" + V"chain_call_parens"
+  chain_call: capture "call", V"chain_call_open" + V"chain_call_parens" + V"chain_call_bang"
   chain_call_open: V"some_space" * not_keyword * capture V"exp_list"
-  chain_call_parens: sym("(", false) * capture(V"exp_list"^-1) *sym ")"
+  chain_call_parens: sym("(", false) * capture(V"exp_list"^-1) * sym ")"
+  chain_call_bang: sym"!" * empty!
   chain_peek: L word * (V"some_space" * S"a-zA-Z_" + P".")
 
   string: capture "string", V"string_double" + V"string_single"

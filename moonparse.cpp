@@ -137,6 +137,15 @@ int push_simple(const char* name, const char* value) {
   return 1;
 }
 
+int push_empty() {
+  if (DEBUG) {
+    printf("* pushing empty\n");
+  }
+
+  lua_newtable(_l);
+	return 1;
+}
+
 // converts a single value exp to just the value
 int flatten_last() {
   int len = lua_objlen(_l, -1);

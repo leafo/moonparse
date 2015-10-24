@@ -467,6 +467,17 @@ foo: bar
     }, parse[[one.hello world, foo + bar, boba cat]]
 
 
+  it "should parse chain with bang", ->
+    assert.same {
+      {
+        "chain"
+        {"ref", "yeah"}
+        {"dot", "cool"}
+        {"call", {}}
+        {"dot", "zone"}
+      }
+    }, parse [[yeah.cool!.zone]]
+
   it "should parse simple string", ->
     assert.same {
       {
