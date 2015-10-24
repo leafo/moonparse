@@ -31,6 +31,24 @@ world]]
 a + c
 ]]
 
+  it "parses parens", ->
+    assert.same {
+      {
+        "exp"
+        {"ref", "k"}
+        "+"
+        {
+          "parens",
+          {
+            "exp"
+            {"ref", "a"}
+            "-"
+            {"ref", "zeta"}
+          }
+        }
+      }
+    }, parse "k + (a - zeta)"
+
   it "should parse if statement", ->
     assert.same {
       {

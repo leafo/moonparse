@@ -128,7 +128,7 @@ print build_grammar {
 
   comment: P"--" * (P(1) - V"break")^0
 
-  value: _ * (V"import" + V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref")
+  value: _ * (V"import" + V"class_decl" + V"array_comprehension" + V"string" + V"table_lit" + V"fn_lit" + V"unbounded_table" + V"chain" + V"number" + V"ref" + V"parens")
 
   word: _ * str word
   word_list: V"word" * (sym"," * V"word")^0
@@ -141,6 +141,7 @@ print build_grammar {
   op: _ * str(S"-+")
   exp: capture "exp", V"value" * (V"op" * V"value")^0, "flatten_last()"
   exp_list: V"exp" * (sym"," * V"exp")^0
+  parens: sym"(" * capture "parens", V"exp" * sym")"
 
   statement: (V"if" + V"for" + V"while" + V"assign" + V"exp") * _ * L(V"stop")
 
